@@ -124,8 +124,25 @@ void print_graph_list(std::map< int, std::set<int> >& graph) {
 int main(int argc, char const *argv[]) {
   std::map< int, std::set<int> > graph;
 
+  int state = 0;
   populate_graph(graph, argv[1]);
-  // print_graph_list(graph);
-  bron_kerbosch_wihthout_pivot(graph);
+
+  while(state != 4) {
+    printf("\n");
+    printf("Escolha uma ação:\n");
+    printf("1 - Mostrar lista de adjacencia\n");
+    printf("2 - BronKerbosch sem pivot:\n");
+    printf("3 - BronKerbosch com pivot:\n");
+    printf("4 - Sair:\n");
+    scanf("%i", &state);
+
+    switch (state) {
+      case 1: print_graph_list(graph);
+      case 2: bron_kerbosch_wihthout_pivot(graph);
+      case 3: bron_kerbosch_wihthout_pivot(graph);
+      case 4: break;
+    }
+  }
+
   return 0;
 }
