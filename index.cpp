@@ -65,7 +65,7 @@ void start_bron_kerbosch_wihthout_pivot(std::set<int>& R, std::set<int>& P, std:
     );
     std::set<int> X_neighbors_intersect;
     set_intersection(
-      P.begin(), P.end(), neighbors.begin(), neighbors.end(),
+      X.begin(), X.end(), neighbors.begin(), neighbors.end(),
       std::inserter(X_neighbors_intersect, X_neighbors_intersect.begin())
     );
 
