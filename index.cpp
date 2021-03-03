@@ -46,7 +46,8 @@ void start_bron_kerbosch_wihthout_pivot(std::set<int>& R, std::set<int>& P, std:
   }
 
   //  for each vertex v in P do
-  for (std::set<int>::iterator iter = P.begin(); iter != P.end(); iter++) {
+  std::set<int> P_to_iterate = P;
+  for (std::set<int>::iterator iter = P_to_iterate.begin(); iter != P_to_iterate.end(); iter++) {
     std::set<int> vertex_set;
     vertex_set.insert(*iter);
 
@@ -79,13 +80,19 @@ void start_bron_kerbosch_wihthout_pivot(std::set<int>& R, std::set<int>& P, std:
     // P = P \ {v}
     std::set<int> P_v_difference;
     set_difference(
-      P.begin(), P.end(), P_v_difference.begin(), P_v_difference.end(),
+      P.begin(), P.end(), vertex_set.begin(), vertex_set.end(),
       std::inserter(P_v_difference, P_v_difference.begin())
     );
     P = P_v_difference;
 
     // X = X union {v}
-    X = return_union(X, vertex_set);
+    std::set<int> X_v_union;
+    set_union(
+      X.begin(), X.end(), vertex_set.begin(), vertex_set.end(),
+      std::inserter(X_v_union, X_v_union.begin())
+    );
+
+    X = X_v_union;
   }
 }
 
