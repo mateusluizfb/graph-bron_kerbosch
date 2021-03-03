@@ -32,7 +32,7 @@ void populate_graph(std::map< int, std::set<int> >& graph, char const argv[]) {
   }
 }
 
-void start_bron_kerbosch_wihthout_pivot(std::set<int>& R, std::set<int>& P, std::set<int>& X, std::map< int, std::set<int> >& graph) {
+void start_bron_kerbosch_without_pivot(std::set<int>& R, std::set<int>& P, std::set<int>& X, std::map< int, std::set<int> >& graph) {
   // if P and X are both empty then
   if(P.empty() && X.empty()) {
     // report R as a maximal clique
@@ -70,7 +70,7 @@ void start_bron_kerbosch_wihthout_pivot(std::set<int>& R, std::set<int>& P, std:
     );
 
     // BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-    start_bron_kerbosch_wihthout_pivot(
+    start_bron_kerbosch_without_pivot(
       R_v_union,
       P_neighbors_intersect,
       X_neighbors_intersect,
@@ -96,7 +96,7 @@ void start_bron_kerbosch_wihthout_pivot(std::set<int>& R, std::set<int>& P, std:
   }
 }
 
-void bron_kerbosch_wihthout_pivot(std::map< int, std::set<int> >& graph) {
+void bron_kerbosch_without_pivot(std::map< int, std::set<int> >& graph) {
   std::set<int> R;
   std::set<int> P;
   std::set<int> X;
@@ -105,8 +105,122 @@ void bron_kerbosch_wihthout_pivot(std::map< int, std::set<int> >& graph) {
     P.insert(iter->first);
   }
 
-  start_bron_kerbosch_wihthout_pivot(R, P, X, graph);
+  start_bron_kerbosch_without_pivot(R, P, X, graph);
 }
+
+int find_pivot(std::set<int>& P_X_union, std::map< int, std::set<int> >& graph) {
+  // find the one with more neighbors
+  int biggest_one_count = 0;
+  int biggest_one_number;
+
+  for (std::set<int>::iterator iter = P_X_union.begin(); iter != P_X_union.end(); iter++) {
+    int neighbors_size = graph[*iter].size();
+
+    if(biggest_one_count < neighbors_size) {
+      biggest_one_count = neighbors_size;
+      biggest_one_number = *iter;
+    }
+  }
+
+  return biggest_one_number;
+}
+
+void start_bron_kerbosch_with_pivot(std::set<int>& R, std::set<int>& P, std::set<int>& X, std::map< int, std::set<int> >& graph) {
+  // if P and X are both empty then
+  if(P.empty() && X.empty()) {
+    // report R as a maximal clique
+    printf("Maximal clique: ");
+    for (std::set<int>::iterator iter = R.begin(); iter != R.end(); iter++) {
+      printf("%i ", *iter);
+    }
+    printf("\n");
+
+    return;
+  }
+
+  // choose a pivot vertex u in P ⋃ X
+  std::set<int> P_X_union;
+  set_union(
+    P.begin(), P.end(), X.begin(), X.end(),
+    std::inserter(P_X_union, P_X_union.begin())
+  );
+
+
+  // P \ N(u)
+  std::set<int> pivot_neighbors = graph[find_pivot(P_X_union, graph)];
+  std::set<int> P_to_iterate = P;
+  set_difference(
+    P.begin(), P.end(), pivot_neighbors.begin(), pivot_neighbors.end(),
+    std::inserter(P_to_iterate, P_to_iterate.begin())
+  );
+
+  //  for each vertex v in P \ N(u) do
+  for (std::set<int>::iterator iter = P_to_iterate.begin(); iter != P_to_iterate.end(); iter++) {
+    std::set<int> vertex_set;
+    vertex_set.insert(*iter);
+
+    // R ⋃ {v}
+    std::set<int> R_v_union;
+    set_union(
+      R.begin(), R.end(), vertex_set.begin(), vertex_set.end(),
+      std::inserter(R_v_union, R_v_union.begin())
+    );
+
+    std::set<int> neighbors = graph[*iter];
+
+    // P ⋂ N(v)
+    std::set<int> P_neighbors_intersect;
+    set_intersection(
+      P.begin(), P.end(), neighbors.begin(), neighbors.end(),
+      std::inserter(P_neighbors_intersect, P_neighbors_intersect.begin())
+    );
+
+    // X ⋂ N(v))
+    std::set<int> X_neighbors_intersect;
+    set_intersection(
+      X.begin(), X.end(), neighbors.begin(), neighbors.end(),
+      std::inserter(X_neighbors_intersect, X_neighbors_intersect.begin())
+    );
+
+    // BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
+    start_bron_kerbosch_with_pivot(
+      R_v_union,
+      P_neighbors_intersect,
+      X_neighbors_intersect,
+      graph
+    );
+
+    // P = P \ {v}
+    std::set<int> P_v_difference;
+    set_difference(
+      P.begin(), P.end(), vertex_set.begin(), vertex_set.end(),
+      std::inserter(P_v_difference, P_v_difference.begin())
+    );
+    P = P_v_difference;
+
+    // X = X union {v}
+    std::set<int> X_v_union;
+    set_union(
+      X.begin(), X.end(), vertex_set.begin(), vertex_set.end(),
+      std::inserter(X_v_union, X_v_union.begin())
+    );
+
+    X = X_v_union;
+  }
+}
+
+void bron_kerbosch_with_pivot(std::map< int, std::set<int> >& graph) {
+  std::set<int> R;
+  std::set<int> P;
+  std::set<int> X;
+
+  for(std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); ++iter){
+    P.insert(iter->first);
+  }
+
+  start_bron_kerbosch_with_pivot(R, P, X, graph);
+}
+
 
 void print_graph_list(std::map< int, std::set<int> >& graph) {
   for(std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); ++iter){
@@ -138,8 +252,8 @@ int main(int argc, char const *argv[]) {
 
     switch (state) {
       case 1: print_graph_list(graph);
-      case 2: bron_kerbosch_wihthout_pivot(graph);
-      case 3: bron_kerbosch_wihthout_pivot(graph);
+      case 2: bron_kerbosch_without_pivot(graph);
+      case 3: bron_kerbosch_with_pivot(graph);
       case 4: break;
     }
   }
