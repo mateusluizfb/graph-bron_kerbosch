@@ -1,0 +1,4 @@
+- Versão do C++: 11
+- Para compilar e executar o programa, apenas digite: `make run`
+- Para compilar manualmente: `g++ index.cpp`
+- Para rodar o executável manualmente: `./a.out soc-dolphins/soc-dolphins.mtx`
