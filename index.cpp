@@ -6,6 +6,8 @@
 #include <set>
 #include <algorithm>
 
+float EDGE_MAX_COUNT = 0.0;
+
 void populate_graph(std::map< int, std::set<int> >& graph, char const argv[]) {
   std::ifstream dolphins_data(argv);
 
@@ -29,6 +31,8 @@ void populate_graph(std::map< int, std::set<int> >& graph, char const argv[]) {
 
     graph[node1].insert(node2);
     graph[node2].insert(node1);
+
+    EDGE_MAX_COUNT += 1.0;
   }
 }
 
@@ -235,26 +239,53 @@ void print_graph_list(std::map< int, std::set<int> >& graph) {
   }
 }
 
+float find_clustering_coefficient(std::map< int, std::set<int> >& graph) {
+  int node_count = graph.size();
+
+  float clustering_coefficient[node_count];
+
+  for (std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); ++iter) {
+    float neighbors_size = (iter->second).size();
+
+    if(neighbors_size == 1 || neighbors_size == 0) {
+      clustering_coefficient[iter->first] = 0.0;
+    }
+
+    if(2 <= neighbors_size) {
+      clustering_coefficient[iter->first] = neighbors_size / EDGE_MAX_COUNT;
+    }
+  }
+
+  float clustering_coefficient_sum = 0.0;
+  for (std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); ++iter) {
+    clustering_coefficient_sum = clustering_coefficient_sum + clustering_coefficient[iter->first];
+  }
+
+  return (clustering_coefficient_sum / node_count);
+}
+
 int main(int argc, char const *argv[]) {
   std::map< int, std::set<int> > graph;
 
   int state = 0;
   populate_graph(graph, argv[1]);
 
-  while(state != 4) {
+  while(state != 5) {
     printf("\n");
     printf("Escolha uma ação:\n");
     printf("1 - Mostrar lista de adjacencia\n");
     printf("2 - BronKerbosch sem pivot:\n");
     printf("3 - BronKerbosch com pivot:\n");
-    printf("4 - Sair:\n");
+    printf("4 - Coeficiente de aglomeração:\n");
+    printf("5 - Sair:\n");
     scanf("%i", &state);
 
     switch (state) {
       case 1: print_graph_list(graph);
       case 2: bron_kerbosch_without_pivot(graph);
       case 3: bron_kerbosch_with_pivot(graph);
-      case 4: break;
+      case 4: printf("Coeficiente de aglomeração: %f\n", find_clustering_coefficient(graph));
+      case 5: break;
     }
   }
 
