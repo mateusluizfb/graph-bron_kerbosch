@@ -11,18 +11,16 @@ float EDGE_MAX_COUNT = 0.0;
 void populate_graph(std::map< int, std::set<int> >& graph, char const argv[]) {
   std::ifstream dolphins_data(argv);
 
-  const std::string DATA_FILE_START_STATEMENT = "62 62 159";
+  int DATA_FILE_START_LINE = 37;
 
-  bool is_real_data = false;
+  int current_line = 1;
   std::string line;
 
   while(getline(dolphins_data, line)) {
-    if(!(line.compare(DATA_FILE_START_STATEMENT))){
-      is_real_data = true;
+    if(current_line != DATA_FILE_START_LINE){
+      current_line++;
       continue;
     }
-
-    if(is_real_data == false) continue;
 
     std::string vertex = line.c_str();
     std::string delimiter = " ";
