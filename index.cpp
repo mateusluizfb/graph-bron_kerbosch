@@ -242,20 +242,18 @@ float find_clustering_coefficient(std::map< int, std::set<int> >& graph) {
 
   float clustering_coefficient[node_count];
 
-  for (std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); ++iter) {
+  for (std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); iter++) {
     float neighbors_size = (iter->second).size();
 
     if(neighbors_size == 1 || neighbors_size == 0) {
       clustering_coefficient[iter->first] = 0.0;
-    }
-
-    if(2 <= neighbors_size) {
-      clustering_coefficient[iter->first] = neighbors_size / EDGE_MAX_COUNT;
+    } else {
+      clustering_coefficient[iter->first] = neighbors_size / ((neighbors_size + 1) * neighbors_size);
     }
   }
 
   float clustering_coefficient_sum = 0.0;
-  for (std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); ++iter) {
+  for (std::map< int, std::set<int> >::iterator iter = graph.begin(); iter != graph.end(); iter++) {
     clustering_coefficient_sum = clustering_coefficient_sum + clustering_coefficient[iter->first];
   }
 
