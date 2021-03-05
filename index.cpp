@@ -277,10 +277,10 @@ int main(int argc, char const *argv[]) {
     scanf("%i", &state);
 
     switch (state) {
-      case 1: print_graph_list(graph);
-      case 2: bron_kerbosch_without_pivot(graph);
-      case 3: bron_kerbosch_with_pivot(graph);
-      case 4: printf("Coeficiente de aglomeração: %f\n", find_clustering_coefficient(graph));
+      case 1: print_graph_list(graph); break;
+      case 2: bron_kerbosch_without_pivot(graph); break;
+      case 3: bron_kerbosch_with_pivot(graph); break;
+      case 4: printf("Coeficiente de aglomeração: %f\n", find_clustering_coefficient(graph)); break;
       case 5: break;
     }
   }
